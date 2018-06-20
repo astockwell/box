@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -50,7 +50,7 @@ func NewClient(clientID, clientsecret, enterpriseID, jWTKeyID, rSAPrivateKeyPemF
 }
 
 func (c *Client) refreshAccessToken() error {
-	log.Println("Refreshing access token")
+	// log.Println("Refreshing access token")
 	tokenRequested := time.Now()
 
 	// Generate Nonce
@@ -103,7 +103,12 @@ func (c *Client) refreshAccessToken() error {
 		return err
 	}
 	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("Unexpected status code while retrieving new Oauth2 access token: %v", res.StatusCode)
+		buf := new(bytes.Buffer)
+		io.Copy(buf, res.Body)
+		res.Body.Close()
+		body := strings.TrimSpace(buf.String())
+		// fmt.Println(body)
+		return fmt.Errorf("Unexpected status code while retrieving new Oauth2 access token: [%v]. HTTP Response body: [%s]", res.StatusCode, body)
 	}
 	// spew.Dump(res)
 
@@ -158,7 +163,7 @@ func (c *Client) HttpDo(req *http.Request) (*http.Response, error) {
 	}
 
 	if resp.StatusCode == http.StatusUnauthorized {
-		log.Printf("Recieved (%s) response, retrying with new token\n", resp.Status)
+		// log.Printf("Recieved (%s) response, retrying with new token\n", resp.Status)
 		err := c.refreshAccessToken()
 		if err != nil {
 			return nil, err

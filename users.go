@@ -18,36 +18,36 @@ var (
 )
 
 type UsersResponse struct {
-	TotalCount int         `json:"total_count"`
-	Entries    []UserEntry `json:"entries"`
-	Limit      int         `json:"limit"`
-	Offset     int         `json:"offset"`
+	TotalCount int          `json:"total_count"`
+	Entries    []*UserEntry `json:"entries"`
+	Limit      int          `json:"limit"`
+	Offset     int          `json:"offset"`
 }
 
 type UserEntry struct {
-	Type          string `json:"type,omitempty"`
-	ID            string `json:"id,omitempty"`
-	Name          string `json:"name,omitempty"`
-	Login         string `json:"login,omitempty"`
-	CreatedAt     string `json:"created_at,omitempty"`
-	ModifiedAt    string `json:"modified_at,omitempty"`
-	Language      string `json:"language,omitempty"`
-	Timezone      string `json:"timezone,omitempty"`
-	SpaceAmount   int64  `json:"space_amount,omitempty"`
-	SpaceUsed     int    `json:"space_used,omitempty"`
-	MaxUploadSize int64  `json:"max_upload_size,omitempty"`
-	Status        string `json:"status,omitempty"`
-	JobTitle      string `json:"job_title,omitempty"`
-	Phone         string `json:"phone,omitempty"`
-	Address       string `json:"address,omitempty"`
-	AvatarURL     string `json:"avatar_url,omitempty"`
+	Type          string  `json:"type,omitempty"`
+	ID            string  `json:"id,omitempty"`
+	Name          string  `json:"name,omitempty"`
+	Login         string  `json:"login,omitempty"`
+	CreatedAt     string  `json:"created_at,omitempty"`
+	ModifiedAt    string  `json:"modified_at,omitempty"`
+	Language      string  `json:"language,omitempty"`
+	Timezone      string  `json:"timezone,omitempty"`
+	SpaceAmount   float64 `json:"space_amount,omitempty"`
+	SpaceUsed     float64 `json:"space_used,omitempty"`
+	MaxUploadSize float64 `json:"max_upload_size,omitempty"`
+	Status        string  `json:"status,omitempty"`
+	JobTitle      string  `json:"job_title,omitempty"`
+	Phone         string  `json:"phone,omitempty"`
+	Address       string  `json:"address,omitempty"`
+	AvatarURL     string  `json:"avatar_url,omitempty"`
 }
 
-func (c *Client) UsersSearchAll(filterTerm string) ([]UserEntry, error) {
+func (c *Client) UsersSearchAll(filterTerm string) ([]*UserEntry, error) {
 	// TODO: add method paramter for field list
 	// TODO: add method paramter for user_type
 
-	ues := []UserEntry{}
+	ues := []*UserEntry{}
 
 	offset := 0
 	limit := 500
@@ -65,7 +65,7 @@ func (c *Client) UsersSearchAll(filterTerm string) ([]UserEntry, error) {
 		parameters.Add("limit", fmt.Sprintf("%d", limit))
 		parameters.Add("filter_term", filterTerm)
 		Url.RawQuery = parameters.Encode()
-		fmt.Println(Url.String())
+		// fmt.Println(Url.String())
 
 		req, err := http.NewRequest("GET", Url.String(), nil)
 		if err != nil {
@@ -108,11 +108,11 @@ func (c *Client) UsersSearchAll(filterTerm string) ([]UserEntry, error) {
 	return ues, nil
 }
 
-func (c *Client) UsersGetAll() ([]UserEntry, error) {
+func (c *Client) UsersGetAll() ([]*UserEntry, error) {
 	// TODO: add method paramter for field list
 	// TODO: add method paramter for user_type
 
-	ues := []UserEntry{}
+	ues := []*UserEntry{}
 
 	offset := 0
 	limit := 500
@@ -129,7 +129,7 @@ func (c *Client) UsersGetAll() ([]UserEntry, error) {
 		parameters.Add("offset", fmt.Sprintf("%d", offset))
 		parameters.Add("limit", fmt.Sprintf("%d", limit))
 		Url.RawQuery = parameters.Encode()
-		fmt.Println(Url.String())
+		// fmt.Println(Url.String())
 
 		req, err := http.NewRequest("GET", Url.String(), nil)
 		if err != nil {
@@ -185,7 +185,7 @@ func (c *Client) UsersGetUser(userID string) (UserEntry, error) {
 	parameters := url.Values{}
 	// parameters.Add("fields", "id,name,login,status")
 	Url.RawQuery = parameters.Encode()
-	fmt.Println(Url.String())
+	// fmt.Println(Url.String())
 
 	req, err := http.NewRequest("GET", Url.String(), nil)
 	if err != nil {
@@ -242,7 +242,7 @@ func (c *Client) UsersUpdateUser(userID string, u *UserEntry) (*UserEntry, error
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(js))
+	// fmt.Println(string(js))
 
 	Url, err := url.Parse(fmt.Sprintf("%s/%s/%s", c.APIBaseURL, "users", userID))
 	if err != nil {
@@ -251,7 +251,7 @@ func (c *Client) UsersUpdateUser(userID string, u *UserEntry) (*UserEntry, error
 	parameters := url.Values{}
 	// parameters.Add("fields", "id,name,login,status")
 	Url.RawQuery = parameters.Encode()
-	fmt.Println(Url.String())
+	// fmt.Println(Url.String())
 
 	req, err := http.NewRequest("PUT", Url.String(), bytes.NewReader(js))
 	if err != nil {
