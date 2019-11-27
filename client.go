@@ -16,6 +16,7 @@ import (
 
 var GrantType = "urn:ietf:params:oauth:grant-type:jwt-bearer" // Via https://github.com/box/box-python-sdk/blob/1.5/boxsdk/auth/jwt_auth.py#L21
 var APIBaseURL = "https://api.box.com/2.0"
+var UploadBaseURL = "https://upload.box.com/api/2.0"
 var APITokenURL = "https://api.box.com/oauth2/token"
 
 type Client struct {
@@ -26,6 +27,7 @@ type Client struct {
 	RSAPrivateKeyPemFilePath string
 	GrantType                string
 	APIBaseURL               string
+	UploadBaseURL            string
 	lastToken                *OauthTokenResponse
 	lastTokenRetrieved       *time.Time
 }
@@ -46,6 +48,7 @@ func NewClient(clientID, clientsecret, enterpriseID, jWTKeyID, rSAPrivateKeyPemF
 		RSAPrivateKeyPemFilePath: rSAPrivateKeyPemFilePath,
 		GrantType:                GrantType,
 		APIBaseURL:               APIBaseURL,
+		UploadBaseURL:            UploadBaseURL,
 	}, nil
 }
 
