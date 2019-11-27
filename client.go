@@ -28,6 +28,7 @@ type Client struct {
 	GrantType                string
 	APIBaseURL               string
 	UploadBaseURL            string
+	SubType                  string
 	lastToken                *OauthTokenResponse
 	lastTokenRetrieved       *time.Time
 }
@@ -49,6 +50,7 @@ func NewClient(clientID, clientsecret, enterpriseID, jWTKeyID, rSAPrivateKeyPemF
 		GrantType:                GrantType,
 		APIBaseURL:               APIBaseURL,
 		UploadBaseURL:            UploadBaseURL,
+		SubType:                  "enterprise",
 	}, nil
 }
 
@@ -65,9 +67,9 @@ func (c *Client) refreshAccessToken() error {
 	// Box JWT Claims reference: https://developer.box.com/v2.0/docs/construct-jwt-claim-manually#section-6-constructing-the-claims
 	// TODO: allow for sub type of 'enterprise' or 'user' and make struct generic (instead of c.EnterpriseID, should be c.Sub I guess???)
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"iss":          c.ClientID,                              // (string, required) The Client ID of the service that created the JWT assertion.
+		"iss": c.ClientID, // (string, required) The Client ID of the service that created the JWT assertion.
 		"sub":          c.EnterpriseID,                          // (string, required) One of either: enterprise_id for a token specific to an enterprise when creating and managing app users; OR app user_id for a token specific to an individual app user
-		"box_sub_type": "enterprise",                            // (string, required) "enterprise" or "user" depending on the type of token being requested in the sub claim.
+		"box_sub_type": c.SubType,                            // (string, required) "enterprise" or "user" depending on the type of token being requested in the sub claim.
 		"aud":          APITokenURL,                             // (string, required) Always “https://api.box.com/oauth2/token” for OAuth2 token requests
 		"jti":          jwtNonce,                                // (string, required) A universally unique identifier specified by the client for this JWT. This is a unique string that is at least 16 characters and at most 128 characters.
 		"exp":          time.Now().Add(30 * time.Second).Unix(), // (NumericDate, required) The unix time as to when this JWT will expire. This can be set to a maximum value of 60 seconds beyond the issue time. Note: It is recommended to set this value to less than the maximum allowed 60 seconds.
