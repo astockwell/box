@@ -24,64 +24,63 @@ type FileUploadRequestParent struct {
 
 type FileUploadResponse struct {
 	TotalCount int `json:"total_count"`
-	Status     int `json:"status"`
 	Entries    []struct {
-		Type        `json:"type"`
-		ID          `json:"id"`
+		Type        string `json:"type"`
+		ID          string `json:"id"`
 		FileVersion struct {
-			Type `json:"type"`
-			ID   `json:"id"`
-			Sha1 `json:"sha1"`
+			Type string `json:"type"`
+			ID   string `json:"id"`
+			Sha1 string `json:"sha1"`
 		} `json:"file_version"`
-		SequenceID     `json:"sequence_id"`
-		Etag           `json:"etag"`
-		Sha1           `json:"sha1"`
-		Name           `json:"name"`
-		Description    `json:"description"`
-		Size           `json:"size"`
+		SequenceID     string `json:"sequence_id"`
+		Etag           string `json:"etag"`
+		Sha1           string `json:"sha1"`
+		Name           string `json:"name"`
+		Description    string `json:"description"`
+		Size           int    `json:"size"`
 		PathCollection struct {
-			TotalCount `json:"total_count"`
+			TotalCount int `json:"total_count"`
 			Entries    []struct {
-				Type       `json:"type"`
-				ID         `json:"id"`
-				SequenceID `json:"sequence_id"`
-				Etag       `json:"etag"`
-				Name       `json:"name"`
+				Type       string      `json:"type"`
+				ID         string      `json:"id"`
+				SequenceID interface{} `json:"sequence_id"`
+				Etag       interface{} `json:"etag"`
+				Name       string      `json:"name"`
 			} `json:"entries"`
 		} `json:"path_collection"`
-		CreatedAt         `json:"created_at"`
-		ModifiedAt        `json:"modified_at"`
-		TrashedAt         `json:"trashed_at"`
-		PurgedAt          `json:"purged_at"`
-		ContentCreatedAt  `json:"content_created_at"`
-		ContentModifiedAt `json:"content_modified_at"`
+		CreatedAt         string      `json:"created_at"`
+		ModifiedAt        string      `json:"modified_at"`
+		TrashedAt         interface{} `json:"trashed_at"`
+		PurgedAt          interface{} `json:"purged_at"`
+		ContentCreatedAt  string      `json:"content_created_at"`
+		ContentModifiedAt string      `json:"content_modified_at"`
 		CreatedBy         struct {
-			Type  `json:"type"`
-			ID    `json:"id"`
-			Name  `json:"name"`
-			Login `json:"login"`
+			Type  string `json:"type"`
+			ID    string `json:"id"`
+			Name  string `json:"name"`
+			Login string `json:"login"`
 		} `json:"created_by"`
 		ModifiedBy struct {
-			Type  `json:"type"`
-			ID    `json:"id"`
-			Name  `json:"name"`
-			Login `json:"login"`
+			Type  string `json:"type"`
+			ID    string `json:"id"`
+			Name  string `json:"name"`
+			Login string `json:"login"`
 		} `json:"modified_by"`
 		OwnedBy struct {
-			Type  `json:"type"`
-			ID    `json:"id"`
-			Name  `json:"name"`
-			Login `json:"login"`
+			Type  string `json:"type"`
+			ID    string `json:"id"`
+			Name  string `json:"name"`
+			Login string `json:"login"`
 		} `json:"owned_by"`
-		SharedLink `json:"shared_link"`
+		SharedLink interface{} `json:"shared_link"`
 		Parent     struct {
-			Type       `json:"type"`
-			ID         `json:"id"`
-			SequenceID `json:"sequence_id"`
-			Etag       `json:"etag"`
-			Name       `json:"name"`
+			Type       string `json:"type"`
+			ID         string `json:"id"`
+			SequenceID string `json:"sequence_id"`
+			Etag       string `json:"etag"`
+			Name       string `json:"name"`
 		} `json:"parent"`
-		ItemStatus `json:"item_status"`
+		ItemStatus string `json:"item_status"`
 	} `json:"entries"`
 }
 
@@ -91,17 +90,17 @@ type FileUploadResponseError struct {
 	Code        string `json:"code"`
 	ContextInfo struct {
 		Conflicts struct {
-			Type        `json:"type"`
-			ID          `json:"id"`
+			Type        string `json:"type"`
+			ID          string `json:"id"`
 			FileVersion struct {
-				Type `json:"type"`
-				ID   `json:"id"`
-				Sha1 `json:"sha1"`
+				Type string `json:"type"`
+				ID   string `json:"id"`
+				Sha1 string `json:"sha1"`
 			} `json:"file_version"`
-			SequenceID `json:"sequence_id"`
-			Etag       `json:"etag"`
-			Sha1       `json:"sha1"`
-			Name       `json:"name"`
+			SequenceID string `json:"sequence_id"`
+			Etag       string `json:"etag"`
+			Sha1       string `json:"sha1"`
+			Name       string `json:"name"`
 		} `json:"conflicts"`
 	} `json:"context_info"`
 	HelpURL   string `json:"help_url"`
