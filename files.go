@@ -23,6 +23,7 @@ type FileUploadRequestParent struct {
 }
 
 type FileUploadResponse struct {
+	Status     int `json:"status"`
 	TotalCount int `json:"total_count"`
 	Entries    []struct {
 		Type        string `json:"type"`
@@ -108,37 +109,37 @@ type FileUploadResponseError struct {
 	RequestID string `json:"request_id"`
 }
 
-func (c *Client) FileUploadFromPath(localFilepath, boxFolderID string) (*FileUploadResponse, *FileUploadResponseError) {
+func (c *Client) FileUploadFromPath(localFilepath, boxFolderID string) (*FileUploadResponse, *FileUploadResponseError, error) {
 	// Validation
 	if localFilepath == "" {
-		return nil, errors.New("No localFilepath provided")
+		return nil, nil, errors.New("No localFilepath provided")
 	}
 	if boxFolderID == "" {
-		return nil, errors.New("No boxFolderID provided")
+		return nil, nil, errors.New("No boxFolderID provided")
 	}
 
 	// filename := filepath.Base(localFilepath)
 
 	Url, err := url.Parse(fmt.Sprintf("%s/%s", c.UploadBaseURL, "files/content"))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Read upload file
 	file, err := os.Open(localFilepath)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer file.Close()
 
 	fileContents, err := ioutil.ReadAll(file)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	fi, err := file.Stat()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var (
@@ -149,7 +150,7 @@ func (c *Client) FileUploadFromPath(localFilepath, boxFolderID string) (*FileUpl
 	// write the file
 	part, err := writer.CreateFormFile("file", fi.Name())
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	part.Write(fileContents)
 
@@ -162,32 +163,32 @@ func (c *Client) FileUploadFromPath(localFilepath, boxFolderID string) (*FileUpl
 	}
 	js, err := json.Marshal(&fureq)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	err = writer.WriteField("attributes", string(js))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	err = writer.Close()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	req, err := http.NewRequest("POST", Url.String(), body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	req.Header.Add("Content-Type", writer.FormDataContentType())
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// make request with valid access token
 	resp, err := c.HttpDo(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Read the response body
@@ -199,51 +200,51 @@ func (c *Client) FileUploadFromPath(localFilepath, boxFolderID string) (*FileUpl
 	if !(resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated) {
 		var fure FileUploadResponseError
 		if err := json.Unmarshal(buf.Bytes(), &fure); err != nil {
-			return nil, fmt.Errorf("Error json.Unmarshal(&fure): %v. Body: %v", err, buf.String())
+			return nil, nil, fmt.Errorf("Error json.Unmarshal(&fure): %v. Body: %v", err, buf.String())
 		}
-		return nil, &fure
+		return nil, &fure, nil
 	}
 
 	var fur FileUploadResponse
 	if err := json.Unmarshal(buf.Bytes(), &fur); err != nil {
-		return nil, fmt.Errorf("Error json.Unmarshal(&fur): %v. Body: %v", err, buf.String())
+		return nil, nil, fmt.Errorf("Error json.Unmarshal(&fur): %v. Body: %v", err, buf.String())
 	}
 
 	// Add status code for later inspection
 	fur.Status = resp.StatusCode
 
-	return &fur, nil
+	return &fur, nil, nil
 }
 
-func (c *Client) FileUploadVersionFromPath(localFilepath, boxFileID string) (*FileUploadResponse, error) {
+func (c *Client) FileUploadVersionFromPath(localFilepath, boxFileID string) (*FileUploadResponse, *FileUploadResponseError, error) {
 	// Validation
 	if localFilepath == "" {
-		return nil, errors.New("No localFilepath provided")
+		return nil, nil, errors.New("No localFilepath provided")
 	}
 	if boxFileID == "" {
-		return nil, errors.New("No boxFileID provided")
+		return nil, nil, errors.New("No boxFileID provided")
 	}
 
 	Url, err := url.Parse(fmt.Sprintf("%s/files/%s/content", c.UploadBaseURL, boxFileID))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Read upload file
 	file, err := os.Open(localFilepath)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer file.Close()
 
 	fileContents, err := ioutil.ReadAll(file)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	fi, err := file.Stat()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var (
@@ -254,7 +255,7 @@ func (c *Client) FileUploadVersionFromPath(localFilepath, boxFileID string) (*Fi
 	// write the file
 	part, err := writer.CreateFormFile("file", fi.Name())
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	part.Write(fileContents)
 
@@ -264,32 +265,32 @@ func (c *Client) FileUploadVersionFromPath(localFilepath, boxFileID string) (*Fi
 	}
 	js, err := json.Marshal(&fureq)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	err = writer.WriteField("attributes", string(js))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	err = writer.Close()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	req, err := http.NewRequest("POST", Url.String(), body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	req.Header.Add("Content-Type", writer.FormDataContentType())
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// make request with valid access token
 	resp, err := c.HttpDo(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Read the response body
@@ -298,16 +299,23 @@ func (c *Client) FileUploadVersionFromPath(localFilepath, boxFileID string) (*Fi
 	resp.Body.Close()
 	// fmt.Println(buf.String())
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Unexpected status code while executing API request: %v. Body: %v", resp.Status, buf.String())
+	if !(resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated) {
+		var fure FileUploadResponseError
+		if err := json.Unmarshal(buf.Bytes(), &fure); err != nil {
+			return nil, nil, fmt.Errorf("Error json.Unmarshal(&fure): %v. Body: %v", err, buf.String())
+		}
+		return nil, &fure, nil
 	}
 
 	var fur FileUploadResponse
 	if err := json.Unmarshal(buf.Bytes(), &fur); err != nil {
-		return nil, err
+		return nil, nil, fmt.Errorf("Error json.Unmarshal(&fur): %v. Body: %v", err, buf.String())
 	}
 
-	return &fur, nil
+	// Add status code for later inspection
+	fur.Status = resp.StatusCode
+
+	return &fur, nil, nil
 }
 
 func (c *Client) FileDownload(boxFileID string) (*http.Response, error) {
