@@ -270,7 +270,7 @@ func (c *Client) FileUploadFromPath(localFilepath, boxFolderID string) (*FileUpl
 	resp.Body.Close()
 	// fmt.Println(buf.String())
 
-	if resp.StatusCode != http.StatusOK || resp.StatusCode != http.StatusCreated {
+	if !(resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated) {
 		return nil, fmt.Errorf("Unexpected status code while executing API request: %v. Body: %v", resp.Status, buf.String())
 	}
 
