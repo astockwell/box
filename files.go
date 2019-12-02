@@ -276,7 +276,7 @@ func (c *Client) FileUploadFromPath(localFilepath, boxFolderID string) (*FileUpl
 
 	var fur FileUploadResponse
 	if err := json.Unmarshal(buf.Bytes(), &fur); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error: %v. Body: %v", err, buf.String())
 	}
 
 	return &fur, nil
